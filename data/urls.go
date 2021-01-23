@@ -1,14 +1,24 @@
 package data
 
 import (
+	"encoding/json"
+	"io"
+	"net/url"
+
 	"github.com/lytics/base62"
 )
 
 //URL struct for storing url details
 type URL struct {
 	ID          int    `json:"id"`
-	OriginalURL string `json:"original_url"`
+	OriginalURL string `json:"url"`
 	ShortURL    string `json:"shortened_url"`
+}
+
+// FromJSON extracts URL struct from JSON
+func (u *URL) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(u)
 }
 
 // Urls is a collection of URL
@@ -69,4 +79,10 @@ func DecodeURL(shortURL string) (string, error) {
 	}
 	longURL := string(decoded)
 	return longURL, nil
+}
+
+// ValidateURL checks if given URL is valid
+func ValidateURL(givenURL string) error {
+	_, err := url.ParseRequestURI(givenURL)
+	return err
 }

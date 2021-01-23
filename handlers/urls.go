@@ -35,7 +35,7 @@ func (u *Urls) GetURL(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// redirect short url to coresponding web page
-	http.Redirect(rw, r, urlData.OriginalURL, http.StatusSeeOther)
+	http.Redirect(rw, r, urlData.OriginalURL, http.StatusPermanentRedirect)
 }
 
 // AddURL adds a new URL struct in urlList
@@ -44,7 +44,7 @@ func (u *Urls) AddURL(rw http.ResponseWriter, r *http.Request) {
 
 	newURL := r.Context().Value(keyURL{}).(data.URL)
 
-	shortURL := data.EncodeURL(newURL.OriginalURL)
+	shortURL := data.ShortURL(newURL.OriginalURL)
 	newURL.ShortURL = shortURL
 
 	data.AddURL(&newURL)

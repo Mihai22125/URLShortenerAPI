@@ -3,10 +3,11 @@ package data
 import (
 	"encoding/json"
 	"io"
+	"math/rand"
 	"net/url"
+	"time"
 
 	"github.com/go-playground/validator"
-	"github.com/lytics/base62"
 )
 
 //URL struct for storing url details
@@ -85,12 +86,29 @@ func GetURLByShort(shortURL string) (*URL, error) {
 	return nil, ErrURLNotFound
 }
 
-// EncodeURL shortens a long url using base62 encoding
-func EncodeURL(longURL string) string {
-	shortened := base62.StdEncoding.EncodeToString([]byte(longURL))
+// ShortURL generates a random string with length 8 that is not present in database yet
+func ShortURL(longURL string) string {
+	shortened := ""
+	for {
+		shortened = randStringBytes(8)
+		if _, err := GetURLByShort(shortened); err != nil {
+			break
+		}
+	}
+
 	return shortened
 }
 
+func randStringBytes(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
+
+/*
 // DecodeURL returns original url from decoding base62 shortened url
 func DecodeURL(shortURL string) (string, error) {
 	decoded, err := base62.StdEncoding.DecodeString(shortURL)
@@ -100,3 +118,4 @@ func DecodeURL(shortURL string) (string, error) {
 	longURL := string(decoded)
 	return longURL, nil
 }
+*/

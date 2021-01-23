@@ -62,14 +62,22 @@ func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 
 		if err != nil {
 			u.l.Println("[ERROR] deserializing URL", err)
-			http.Error(rw, "Error reading URL", http.StatusBadRequest)
+			http.Error(
+				rw,
+				"Error reading URL",
+				http.StatusBadRequest,
+			)
 			return
 		}
 
-		err = data.ValidateURL(newURL.OriginalURL)
+		err = newURL.Validate()
 		if err != nil {
-			u.l.Println("[ERROR] deserializing URL. URL is not valid", err)
-			http.Error(rw, "Given URL is not valid", http.StatusBadRequest)
+			u.l.Println("[ERROR] validating URL. URL is not valid", err)
+			http.Error(
+				rw,
+				"URL is not valid",
+				http.StatusBadRequest,
+			)
 			return
 
 		}

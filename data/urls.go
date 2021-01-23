@@ -5,13 +5,14 @@ import (
 	"io"
 	"net/url"
 
+	"github.com/go-playground/validator"
 	"github.com/lytics/base62"
 )
 
 //URL struct for storing url details
 type URL struct {
 	ID          int    `json:"id"`
-	OriginalURL string `json:"url"`
+	OriginalURL string `json:"url" validate:"required,url"`
 	ShortURL    string `json:"shortened_url"`
 }
 
@@ -19,6 +20,25 @@ type URL struct {
 func (u *URL) FromJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
 	return e.Decode(u)
+}
+
+// validate checks if given URL is valid
+func (u *URL) Validate() error {
+	validate := validator.New()
+	return validate.Struct(u)
+}
+
+// ValidateURL checks if given URL is valid
+func validateURL(fl validator.FieldLevel) bool {
+	u, err := url.Parse(fl.Field().String())
+	if err != nil {
+		return false
+	}
+	if u.Scheme == "" || u.Host == "" || u.Path == "" {
+		return false
+	}
+
+	return true
 }
 
 // Urls is a collection of URL
@@ -79,10 +99,4 @@ func DecodeURL(shortURL string) (string, error) {
 	}
 	longURL := string(decoded)
 	return longURL, nil
-}
-
-// ValidateURL checks if given URL is valid
-func ValidateURL(givenURL string) error {
-	_, err := url.ParseRequestURI(givenURL)
-	return err
 }

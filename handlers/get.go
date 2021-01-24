@@ -21,5 +21,5 @@ func (u *Urls) GetURL(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// redirect short url to coresponding web page
-	http.Redirect(rw, r, urlData.OriginalURL, http.StatusPermanentRedirect)
+	http.Redirect(rw, r, urlData.OriginalURL, http.StatusMovedPermanently)
 }

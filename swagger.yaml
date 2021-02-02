@@ -1,0 +1,105 @@
+basePath: /api/v1/
+consumes:
+- application/json
+- string
+host: localhost:8080
+info:
+  description: Documentation of URL-shortener API
+  title: classification URL-shortener API
+  version: 1.0.0
+paths:
+  /:
+    get:
+      consumes:
+      - string
+      description: Redirects shortened URL given as parameter to original URL
+      operationId: redirectLink
+      parameters:
+      - description: a string resulted from shortening an URL
+        example: sdgh7e
+        in: path
+        name: shortURL
+        required: true
+        type: string
+        x-go-name: ShortURL
+      responses:
+        "301":
+          $ref: '#/responses/redirectResponse'
+        "404":
+          $ref: '#/responses/redirectError'
+      tags:
+      - redirect
+    post:
+      consumes:
+      - application/json
+      description: adds new link to datebase and returns respective shortened string
+      operationId: addLink
+      parameters:
+      - description: original link wanted to be shortened
+        example: https://www.google.com
+        in: body
+        name: Body
+        required: true
+        schema:
+          properties:
+            url:
+              type: string
+              x-go-name: OriginalURL
+          type: object
+      produces:
+      - string
+      responses:
+        "200":
+          $ref: '#/responses/addLinkSuccessResponse'
+        "400":
+          $ref: '#/responses/errorResponse'
+        "422":
+          $ref: '#/responses/errorValidation'
+      tags:
+      - postLink
+produces:
+- string
+responses:
+  addLinkSuccessResponse:
+    description: Data structure representing a shortened link
+    schema:
+      properties:
+        shortURL:
+          type: string
+          x-go-name: ShortURL
+      type: object
+  errorResponse:
+    description: Generic error message returned as a string
+    schema:
+      properties:
+        message:
+          type: string
+          x-go-name: Message
+      type: object
+  errorValidation:
+    description: Validation errors defined as an array of strings
+    schema:
+      properties:
+        messages:
+          items:
+            type: string
+          type: array
+          x-go-name: Messages
+      type: object
+  noContentResponse:
+    description: No content is returned by this API endpoint
+  redirectError:
+    description: redirect error
+    schema:
+      properties:
+        Message:
+          description: shortened URL doesn't exist
+          type: string
+      required:
+      - Message
+      type: object
+  redirectResponse:
+    description: redirected succesfull
+schemes:
+- http
+swagger: "2.0"

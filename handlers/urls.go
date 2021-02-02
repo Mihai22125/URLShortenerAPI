@@ -20,6 +20,16 @@ func NewUrls(l *log.Logger) *Urls {
 	return &Urls{l}
 }
 
+// GenericError is a generic error message returned by a server
+type GenericError struct {
+	Message string `json:"message"`
+}
+
+// ValidationError is a collection of validation error messages
+type ValidationError struct {
+	Messages []string `json:"messages"`
+}
+
 // MiddlewareValidateURL checks if given URL is valid
 func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
@@ -32,7 +42,7 @@ func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 			http.Error(
 				rw,
 				"Error reading URL",
-				http.StatusBadRequest,
+				http.StatusUnprocessableEntity,
 			)
 			return
 		}
@@ -42,7 +52,7 @@ func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 			u.l.Println("[ERROR] validating URL. URL is not valid", err)
 			http.Error(
 				rw,
-				"URL is not valid",
+				err.Error(),
 				http.StatusBadRequest,
 			)
 			return

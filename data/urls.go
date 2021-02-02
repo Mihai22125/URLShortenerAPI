@@ -23,7 +23,7 @@ func (u *URL) FromJSON(r io.Reader) error {
 	return e.Decode(u)
 }
 
-// validate checks if given URL is valid
+// Validate checks if given URL is valid
 func (u *URL) Validate() error {
 	validate := validator.New()
 	return validate.Struct(u)

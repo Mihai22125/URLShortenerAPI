@@ -7,6 +7,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// swagger:route GET /  redirect redirectLink
+// Redirects shortened URL given as parameter to original URL
+// consumes:
+//     -string
+//
+// responses:
+//      301: redirectResponse
+//      404: redirectError
+
 // GetURL redirects shortened URL to original URL
 func (u *Urls) GetURL(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET URL")

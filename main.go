@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/Mihai22125/URLShortenerAPI/handlers"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"github.com/nicholasjackson/env"
+	_ "github.com/pdrum/swagger-automation/docs" // This line is necessary for go-swagger to find docs!
 )
 
 var bindAddress = env.String("BIND_ADRESS", false, ":8080", "Bind address for the server")
@@ -34,6 +36,12 @@ func main() {
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/api/v1/", uh.AddURL)
 	postRouter.Use(uh.MiddlewareValidateURL)
+
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// create a new server
 

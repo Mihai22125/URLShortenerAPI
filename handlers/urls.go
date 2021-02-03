@@ -38,10 +38,10 @@ func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 		err := newURL.FromJSON(r.Body)
 
 		if err != nil {
-			u.l.Println("[ERROR] deserializing URL", err)
+			u.l.Println("[MiddlewareValidateURL] error deserializing URL: ", err)
 			http.Error(
 				rw,
-				"Error reading URL",
+				"Error reading request body",
 				http.StatusUnprocessableEntity,
 			)
 			return
@@ -49,14 +49,23 @@ func (u *Urls) MiddlewareValidateURL(next http.Handler) http.Handler {
 
 		err = newURL.Validate()
 		if err != nil {
-			u.l.Println("[ERROR] validating URL. URL is not valid", err)
+			u.l.Println("[MiddlewareValidateURL] error validating request body: ", err)
 			http.Error(
 				rw,
-				err.Error(),
+				"Error validating request body",
 				http.StatusBadRequest,
 			)
 			return
+		}
 
+		if data.ValidateURL(newURL.OriginalURL) == false {
+			u.l.Println("[MiddlewareValidateURL] error invalid URL")
+			http.Error(
+				rw,
+				"Error invalid URL",
+				http.StatusBadRequest,
+			)
+			return
 		}
 
 		// add the product to the context

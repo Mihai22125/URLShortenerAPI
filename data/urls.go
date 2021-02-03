@@ -12,9 +12,9 @@ import (
 
 //URL struct for storing url details
 type URL struct {
-	ID          int    `json:"id"`
-	OriginalURL string `json:"url" validate:"required,url"`
-	ShortURL    string `json:"shortened_url"`
+	ID          int    `json:"id" validate: "-"`
+	OriginalURL string `json:"url" validate:"required"`
+	ShortURL    string `json:"shortened_url" validate: "-"`
 }
 
 // FromJSON extracts URL struct from JSON
@@ -23,19 +23,19 @@ func (u *URL) FromJSON(r io.Reader) error {
 	return e.Decode(u)
 }
 
-// Validate checks if given URL is valid
+// Validate checks if URL struct valid
 func (u *URL) Validate() error {
 	validate := validator.New()
 	return validate.Struct(u)
 }
 
 // ValidateURL checks if given URL is valid
-func validateURL(fl validator.FieldLevel) bool {
-	u, err := url.Parse(fl.Field().String())
+func ValidateURL(longURL string) bool {
+	u, err := url.Parse(longURL)
 	if err != nil {
 		return false
 	}
-	if u.Scheme == "" || u.Host == "" || u.Path == "" {
+	if u.Scheme == "" || u.Host == "" {
 		return false
 	}
 

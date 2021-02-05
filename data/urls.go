@@ -43,7 +43,9 @@ func ValidateURL(longURL string) bool {
 }
 
 // Urls is a collection of URL
-type Urls []*URL
+type Urls struct {
+	data []*URL
+}
 
 // urlList ia a list of Urls
 var urlList = Urls{}
@@ -51,23 +53,23 @@ var urlList = Urls{}
 // AddURL adds a new URL to urlList
 func (urlList Urls) AddURL(u *URL) {
 	u.ID = urlList.getNextID()
-	urlList = append(urlList, u)
+	urlList.data = append(urlList.data, u)
 }
 
 // getNextID generates a new ID for a new entry in urlList
 func (urlList Urls) getNextID() int {
-	if len(urlList) == 0 {
+	if len(urlList.data) == 0 {
 		return 0
 	}
 
-	last := urlList[len(urlList)-1]
+	last := urlList.data[len(urlList.data)-1]
 	return last.ID + 1
 }
 
 // GetURLByLong returns the URL struct with given original url from urlList
 // returns ErrUrlNotFOund if url does not exists in urlList
 func (urlList Urls) GetURLByLong(longURL string) (*URL, error) {
-	for _, u := range urlList {
+	for _, u := range urlList.data {
 		if u.OriginalURL == longURL {
 			return u, nil
 		}
@@ -78,7 +80,7 @@ func (urlList Urls) GetURLByLong(longURL string) (*URL, error) {
 
 // GetURLByShort return the URL struct with given shortened URL from urlList
 func (urlList Urls) GetURLByShort(shortURL string) (*URL, error) {
-	for _, u := range urlList {
+	for _, u := range urlList.data {
 		if u.ShortURL == shortURL {
 			return u, nil
 		}
@@ -107,15 +109,3 @@ func randStringBytes(n int) string {
 	}
 	return string(b)
 }
-
-/*
-// DecodeURL returns original url from decoding base62 shortened url
-func DecodeURL(shortURL string) (string, error) {
-	decoded, err := base62.StdEncoding.DecodeString(shortURL)
-	if err != nil {
-		return "", ErrFailedDecodeURL
-	}
-	longURL := string(decoded)
-	return longURL, nil
-}
-*/

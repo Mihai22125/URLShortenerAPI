@@ -51,13 +51,13 @@ type Urls struct {
 var urlList = Urls{}
 
 // AddURL adds a new URL to urlList
-func (urlList Urls) AddURL(u *URL) {
+func (urlList *Urls) AddURL(u *URL) {
 	u.ID = urlList.getNextID()
 	urlList.data = append(urlList.data, u)
 }
 
 // getNextID generates a new ID for a new entry in urlList
-func (urlList Urls) getNextID() int {
+func (urlList *Urls) getNextID() int {
 	if len(urlList.data) == 0 {
 		return 0
 	}
@@ -68,7 +68,7 @@ func (urlList Urls) getNextID() int {
 
 // GetURLByLong returns the URL struct with given original url from urlList
 // returns ErrUrlNotFOund if url does not exists in urlList
-func (urlList Urls) GetURLByLong(longURL string) (*URL, error) {
+func (urlList *Urls) GetURLByLong(longURL string) (*URL, error) {
 	for _, u := range urlList.data {
 		if u.OriginalURL == longURL {
 			return u, nil
@@ -79,7 +79,7 @@ func (urlList Urls) GetURLByLong(longURL string) (*URL, error) {
 }
 
 // GetURLByShort return the URL struct with given shortened URL from urlList
-func (urlList Urls) GetURLByShort(shortURL string) (*URL, error) {
+func (urlList *Urls) GetURLByShort(shortURL string) (*URL, error) {
 	for _, u := range urlList.data {
 		if u.ShortURL == shortURL {
 			return u, nil
@@ -89,7 +89,7 @@ func (urlList Urls) GetURLByShort(shortURL string) (*URL, error) {
 }
 
 // ShortURL generates a random string with length 8 that is not present in database yet
-func (urlList Urls) ShortURL(longURL string) string {
+func (urlList *Urls) ShortURL(longURL string) string {
 	shortened := ""
 	for {
 		shortened = randStringBytes(8)

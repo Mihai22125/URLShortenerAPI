@@ -12,6 +12,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/nicholasjackson/env v0.6.0
 	github.com/pdrum/swagger-automation v0.0.0-20190629163613-c8c7c80ba858
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/sys v0.0.0-20210123231150-1d476976d117 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect

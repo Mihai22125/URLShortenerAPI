@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Mihai22125/URLShortenerAPI/data"
 	"github.com/Mihai22125/URLShortenerAPI/handlers"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
@@ -23,9 +24,10 @@ func main() {
 	env.Parse()
 
 	l := log.New(os.Stdout, "url-api", log.LstdFlags)
+	urlList := data.Urls{}
 
 	// create the handlers
-	uh := handlers.NewUrls(l)
+	uh := handlers.NewUrls(l, urlList)
 
 	// create a new serve mux
 	sm := mux.NewRouter()

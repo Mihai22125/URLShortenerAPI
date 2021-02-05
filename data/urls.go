@@ -12,9 +12,9 @@ import (
 
 //URL struct for storing url details
 type URL struct {
-	ID          int    `json:"id" validate: "-"`
+	ID          int    `json:"id" validate:"isdefault"`
 	OriginalURL string `json:"url" validate:"required"`
-	ShortURL    string `json:"shortened_url" validate: "-"`
+	ShortURL    string `json:"shortened_url" validate:"isdefault"`
 }
 
 // FromJSON extracts URL struct from JSON
@@ -49,13 +49,13 @@ type Urls []*URL
 var urlList = Urls{}
 
 // AddURL adds a new URL to urlList
-func AddURL(u *URL) {
-	u.ID = getNextID()
+func (urlList Urls) AddURL(u *URL) {
+	u.ID = urlList.getNextID()
 	urlList = append(urlList, u)
 }
 
 // getNextID generates a new ID for a new entry in urlList
-func getNextID() int {
+func (urlList Urls) getNextID() int {
 	if len(urlList) == 0 {
 		return 0
 	}
@@ -66,7 +66,7 @@ func getNextID() int {
 
 // GetURLByLong returns the URL struct with given original url from urlList
 // returns ErrUrlNotFOund if url does not exists in urlList
-func GetURLByLong(longURL string) (*URL, error) {
+func (urlList Urls) GetURLByLong(longURL string) (*URL, error) {
 	for _, u := range urlList {
 		if u.OriginalURL == longURL {
 			return u, nil
@@ -77,7 +77,7 @@ func GetURLByLong(longURL string) (*URL, error) {
 }
 
 // GetURLByShort return the URL struct with given shortened URL from urlList
-func GetURLByShort(shortURL string) (*URL, error) {
+func (urlList Urls) GetURLByShort(shortURL string) (*URL, error) {
 	for _, u := range urlList {
 		if u.ShortURL == shortURL {
 			return u, nil
@@ -87,11 +87,11 @@ func GetURLByShort(shortURL string) (*URL, error) {
 }
 
 // ShortURL generates a random string with length 8 that is not present in database yet
-func ShortURL(longURL string) string {
+func (urlList Urls) ShortURL(longURL string) string {
 	shortened := ""
 	for {
 		shortened = randStringBytes(8)
-		if _, err := GetURLByShort(shortened); err != nil {
+		if _, err := urlList.GetURLByShort(shortened); err != nil {
 			break
 		}
 	}

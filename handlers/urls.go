@@ -10,14 +10,15 @@ import (
 
 // Urls is a http.Handler
 type Urls struct {
-	l *log.Logger
+	l       *log.Logger
+	urlList data.Urls
 }
 
 type keyURL struct{}
 
 // NewUrls creates a Urls handler
-func NewUrls(l *log.Logger) *Urls {
-	return &Urls{l}
+func NewUrls(l *log.Logger, urlList data.Urls) *Urls {
+	return &Urls{l, urlList}
 }
 
 // GenericError is a generic error message returned by a server

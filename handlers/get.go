@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Mihai22125/URLShortenerAPI/data"
 	"github.com/gorilla/mux"
 )
 
@@ -24,7 +23,7 @@ func (u *Urls) GetURL(rw http.ResponseWriter, r *http.Request) {
 	shortURL := vars["shortURL"]
 
 	// check if given shortened url exists in database
-	urlData, err := data.GetURLByShort(shortURL)
+	urlData, err := u.urlList.GetURLByShort(shortURL)
 	if err != nil {
 		http.Error(rw, "shortened URL does not exist", http.StatusNotFound)
 		return

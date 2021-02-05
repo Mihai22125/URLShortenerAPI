@@ -24,10 +24,10 @@ func (u *Urls) AddURL(rw http.ResponseWriter, r *http.Request) {
 
 	newURL := r.Context().Value(keyURL{}).(data.URL)
 
-	shortURL := data.ShortURL(newURL.OriginalURL)
+	shortURL := u.urlList.ShortURL(newURL.OriginalURL)
 	newURL.ShortURL = shortURL
 
-	data.AddURL(&newURL)
+	u.urlList.AddURL(&newURL)
 
 	// return shortened URL for given link
 	rw.Write([]byte(newURL.ShortURL))

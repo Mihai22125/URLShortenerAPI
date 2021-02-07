@@ -1,17 +1,27 @@
-package data_test
+package data
 
 import (
 	"io"
 	"strings"
 	"testing"
 
-	"github.com/Mihai22125/URLShortenerAPI/data"
 	"github.com/stretchr/testify/require"
 )
 
+func TestInit(t *testing.T) {
+
+	db := Urls{}
+
+	list := []*URL{
+		{ID: 0, OriginalURL: "https://www.example1.com", ShortURL: "aaaaaaaa"},
+		{ID: 1, OriginalURL: "https://www.example2.org", ShortURL: "abcdabcd"},
+	}
+	db.Init(list)
+}
+
 func TestFromJSON(t *testing.T) {
 
-	testStruct := &data.URL{}
+	testStruct := &URL{}
 	tt := []struct {
 		name     string
 		body     io.Reader
@@ -53,42 +63,42 @@ func TestValidate(t *testing.T) {
 	// tt - testing table
 	tt := []struct {
 		name      string
-		urlStruct data.URL
+		urlStruct URL
 		expected  bool
 	}{
 		{
 			"shouldPass1",
-			data.URL{OriginalURL: "https://www.example.com"},
+			URL{OriginalURL: "https://www.example.com"},
 			true,
 		},
 		{
 			"shouldPass2",
-			data.URL{OriginalURL: "aaa"},
+			URL{OriginalURL: "aaa"},
 			true,
 		},
 		{
 			"shouldFail1_empty_struct",
-			data.URL{},
+			URL{},
 			false,
 		},
 		{
 			"shouldFail2_no_url_field",
-			data.URL{ID: 2},
+			URL{ID: 2},
 			false,
 		},
 		{
 			"shouldFail3_unexpected_field",
-			data.URL{ID: 2, OriginalURL: "https://www.example.com"},
+			URL{ID: 2, OriginalURL: "https://www.example.com"},
 			false,
 		},
 		{
 			"shouldFail4_unexpected_field",
-			data.URL{ShortURL: "dsdf", OriginalURL: "https://www.example.com"},
+			URL{ShortURL: "dsdf", OriginalURL: "https://www.example.com"},
 			false,
 		},
 		{
 			"shouldFail5_empty_url_string",
-			data.URL{OriginalURL: ""},
+			URL{OriginalURL: ""},
 			false,
 		},
 	}
@@ -124,7 +134,7 @@ func TestValidateURL(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			result := data.ValidateURL(tc.url)
+			result := ValidateURL(tc.url)
 			if result != tc.expected {
 				t.Errorf("url: %v : expected %v; got %v", tc.url, tc.expected, result)
 			}
@@ -134,7 +144,7 @@ func TestValidateURL(t *testing.T) {
 
 func TestAddURL(t *testing.T) {
 
-	testUrlList := data.Urls{}
+	testURLList := Urls{}
 	tt := []struct {
 		name       string
 		longURL    string
@@ -146,9 +156,8 @@ func TestAddURL(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			testUrlList.AddURL(&data.URL{OriginalURL: tc.longURL})
-			urlFromSlice, err := testUrlList.GetURLByLong(tc.longURL)
-			require.Equal(t, err, nil)
+			testURLList.AddURL(&URL{OriginalURL: tc.longURL})
+			urlFromSlice := testURLList.data[tc.expectedID]
 			require.Equal(t, urlFromSlice.OriginalURL, tc.longURL)
 			require.Equal(t, urlFromSlice.ID, tc.expectedID)
 			require.NotNil(t, urlFromSlice.ShortURL)
@@ -157,28 +166,23 @@ func TestAddURL(t *testing.T) {
 }
 
 func TestGetNextID(t *testing.T) {
-	testUrlList := data.Urls{}
-	tt := []struct {
-		name       string
-		longURL    string
-		expectedID int
-	}{
-		{"first item ID in slice", "https://www.example1.com", 0},
-		{"second item ID slice", "https://www.example2.org", 1},
-	}
+	testURLList := Urls{}
 
-	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
-			testUrlList.AddURL(&data.URL{OriginalURL: tc.longURL})
-			urlFromSlice, err := testUrlList.GetURLByLong(tc.longURL)
-			require.Equal(t, err, nil)
-			require.Equal(t, urlFromSlice.ID, tc.expectedID)
-		})
-	}
+	t.Run("empty database", func(t *testing.T) {
+		id := testURLList.getNextID()
+		require.Equal(t, id, 0)
+	})
+	testURLList.data[0] = &URL{ID: 0, OriginalURL: "http://www.example.com", ShortURL: "aaa"}
+
+	t.Run("not empty database", func(t *testing.T) {
+		id := testURLList.getNextID()
+		require.Equal(t, id, 1)
+	})
+
 }
 
 func TestGetURLByLong(t *testing.T) {
-	testUrlList := data.Urls{}
+	testURLList := Urls{}
 	tt := []struct {
 		name          string
 		longURL       string
@@ -186,16 +190,16 @@ func TestGetURLByLong(t *testing.T) {
 	}{
 		{"shouldPass1", "https://www.example1.com", nil},
 		{"shouldPass2", "https://www.example2.org", nil},
-		{"shouldFail1", "http://www.sdfds.com", data.ErrURLNotFound},
+		{"shouldFail1", "http://www.sdfds.com", ErrURLNotFound},
 	}
 
 	// add some items in slice
-	testUrlList.AddURL(&data.URL{OriginalURL: tt[0].longURL})
-	testUrlList.AddURL(&data.URL{OriginalURL: tt[1].longURL})
+	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL}
+	testURLList.data[1] = &URL{OriginalURL: tt[1].longURL}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			urlFromSlice, err := testUrlList.GetURLByLong(tc.longURL)
+			urlFromSlice, err := testURLList.GetURLByLong(tc.longURL)
 			require.Equal(t, err, tc.expectedError)
 			if err != nil {
 				return
@@ -206,7 +210,7 @@ func TestGetURLByLong(t *testing.T) {
 }
 
 func TestGetURLByShort(t *testing.T) {
-	testUrlList := data.Urls{}
+	testURLList := Urls{}
 	tt := []struct {
 		name          string
 		longURL       string
@@ -215,16 +219,16 @@ func TestGetURLByShort(t *testing.T) {
 	}{
 		{"shouldPass1", "https://www.example1.com", "aaaaaa", nil},
 		{"shouldPass2", "https://www.example2.org", "123456", nil},
-		{"shouldFail1", "http://www.sdfds.com", "dvsdgf", data.ErrURLNotFound},
+		{"shouldFail1", "http://www.sdfds.com", "dvsdgf", ErrURLNotFound},
 	}
 
 	// add some items in slice
-	testUrlList.AddURL(&data.URL{OriginalURL: tt[0].longURL, ShortURL: tt[0].shortURL})
-	testUrlList.AddURL(&data.URL{OriginalURL: tt[1].longURL, ShortURL: tt[1].shortURL})
+	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL, ShortURL: tt[0].shortURL}
+	testURLList.data[1] = &URL{OriginalURL: tt[1].longURL, ShortURL: tt[1].shortURL}
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			urlFromSlice, err := testUrlList.GetURLByShort(tc.shortURL)
+			urlFromSlice, err := testURLList.GetURLByShort(tc.shortURL)
 			require.Equal(t, err, tc.expectedError)
 			if err != nil {
 				return
@@ -236,7 +240,7 @@ func TestGetURLByShort(t *testing.T) {
 }
 
 func TestShortURL(t *testing.T) {
-	testUrlList := data.Urls{}
+	testURLList := Urls{}
 	tt := []struct {
 		name          string
 		longURL       string
@@ -245,13 +249,12 @@ func TestShortURL(t *testing.T) {
 		{"shouldPass1", "https://www.example1.com", nil},
 		{"shouldPass2", "https://www.example2.org", nil},
 	}
-
+	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			shortURL := testUrlList.ShortURL(tc.longURL)
+			shortURL := testURLList.ShortURL(tc.longURL)
 			// require.Regexp(t, regexp.MustCompile("(?i)[a-z]{8}"), randStr)
 			require.NotNil(t, shortURL)
-			testUrlList.AddURL(&data.URL{OriginalURL: tt[0].longURL, ShortURL: shortURL})
 		})
 	}
 }

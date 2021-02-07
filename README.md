@@ -7,7 +7,7 @@
 
 ## Installation
 
-TL;DR - just show me how to install and run the code. Fork or clone the code.
+Fork or clone the code.
 
 ```bash
 git clone https://github.com/Mihai22125/URLShortenerAPI.git

@@ -20,12 +20,14 @@ func (u *Urls) GetURL(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET URL")
 
 	vars := mux.Vars(r)
+	u.l.Println(r)
+	u.l.Println(vars)
 	shortURL := vars["shortURL"]
 
 	// check if given shortened url exists in database
 	urlData, err := u.urlList.GetURLByShort(shortURL)
 	if err != nil {
-		http.Error(rw, "shortened URL does not exist", http.StatusNotFound)
+		http.Error(rw, ErrShortenedNotExist.Error(), http.StatusNotFound)
 		return
 	}
 	// redirect short url to coresponding web page

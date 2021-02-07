@@ -47,8 +47,10 @@ type Urls struct {
 	data []*URL
 }
 
-// urlList ia a list of Urls
-var urlList = Urls{}
+// Init initialises an urlList with specified data
+func (urlList *Urls) Init(data []*URL) {
+	urlList.data = data
+}
 
 // AddURL adds a new URL to urlList
 func (urlList *Urls) AddURL(u *URL) {

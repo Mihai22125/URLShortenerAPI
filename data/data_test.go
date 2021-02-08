@@ -172,7 +172,7 @@ func TestGetNextID(t *testing.T) {
 		id := testURLList.getNextID()
 		require.Equal(t, id, 0)
 	})
-	testURLList.data[0] = &URL{ID: 0, OriginalURL: "http://www.example.com", ShortURL: "aaa"}
+	testURLList.data = append(testURLList.data, &URL{ID: 0, OriginalURL: "http://www.example.com", ShortURL: "aaa"})
 
 	t.Run("not empty database", func(t *testing.T) {
 		id := testURLList.getNextID()
@@ -194,8 +194,8 @@ func TestGetURLByLong(t *testing.T) {
 	}
 
 	// add some items in slice
-	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL}
-	testURLList.data[1] = &URL{OriginalURL: tt[1].longURL}
+	testURLList.data = append(testURLList.data, &URL{OriginalURL: tt[0].longURL})
+	testURLList.data = append(testURLList.data, &URL{OriginalURL: tt[1].longURL})
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
@@ -223,8 +223,8 @@ func TestGetURLByShort(t *testing.T) {
 	}
 
 	// add some items in slice
-	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL, ShortURL: tt[0].shortURL}
-	testURLList.data[1] = &URL{OriginalURL: tt[1].longURL, ShortURL: tt[1].shortURL}
+	testURLList.data = append(testURLList.data, &URL{OriginalURL: tt[0].longURL, ShortURL: tt[0].shortURL})
+	testURLList.data = append(testURLList.data, &URL{OriginalURL: tt[1].longURL, ShortURL: tt[1].shortURL})
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
@@ -249,7 +249,7 @@ func TestShortURL(t *testing.T) {
 		{"shouldPass1", "https://www.example1.com", nil},
 		{"shouldPass2", "https://www.example2.org", nil},
 	}
-	testURLList.data[0] = &URL{OriginalURL: tt[0].longURL}
+	testURLList.data = append(testURLList.data, &URL{OriginalURL: tt[0].longURL})
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			shortURL := testURLList.ShortURL(tc.longURL)

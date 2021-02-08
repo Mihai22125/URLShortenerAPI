@@ -3,11 +3,11 @@
 
 @author Mihai Timbota-Belin 
 
-@version 1.0.1
+@version 1.0.0
 
 ## Installation
 
-TL;DR - just show me how to install and run the code. Fork or clone the code.
+Fork or clone the code.
 
 ```bash
 git clone https://github.com/Mihai22125/URLShortenerAPI.git

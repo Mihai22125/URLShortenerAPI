@@ -1,4 +1,5 @@
 # URLShortenerAPI
+[![codecov](https://codecov.io/gh/Mihai22125/URLShortenerAPI/branch/main/graph/badge.svg?token=OASAGF80FE)](https://codecov.io/gh/Mihai22125/URLShortenerAPI)
 ### This is a HTTP Service for creating short url 
 
 @author Mihai Timbota-Belin 
